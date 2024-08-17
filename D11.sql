@@ -41,21 +41,14 @@ AND activities.activity_type IN ('send', 'open')
 GROUP BY age.age_bucket;
 
 ---EX4
-WITH supercloud_cust AS (
-  SELECT 
-  customers.customer_id, 
-  COUNT(DISTINCT products.product_category) AS product_count
-  FROM customer_contracts AS customers
-  JOIN products 
-  ON customers.product_id = products.product_id
-  GROUP BY customers.customer_id
-)
-
-SELECT customer_id
-FROM supercloud_cust
-WHERE product_count = (
-  SELECT COUNT(DISTINCT product_category) FROM products
-);
+SELECT
+    customer_id,
+    COUNT(DISTINCT products.product_category)
+FROM customer_contracts
+JOIN products 
+ON customer_contracts.product_id = products.product_id
+GROUP BY customer_id
+HAVING COUNT(DISTINCT products.product_category) = 3;
 
 --EX5
 SELECT 
