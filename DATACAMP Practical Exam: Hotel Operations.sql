@@ -35,29 +35,18 @@ GROUP BY
 
 --Task 3
 SELECT
-
     s.description AS description,
-
     b.id AS id,
-
     b.location AS location,
-
     r.id AS request_id,
-
     r.rating AS rating
-
-FROM
-
-    request r
-
-    JOIN branch b ON b.id = r.branch_id
-
-    JOIN service s ON r.service_id = s.id
-
+FROM request AS r
+JOIN branch AS b
+	ON b.id = r.branch_id
+JOIN service AS s 
+	ON r.service_id = s.id
 WHERE
-
     s.description IN ('Meal', 'Laundry')
-
     AND b.location IN ('EMEA', 'LATAM');
 
 --Task 4
