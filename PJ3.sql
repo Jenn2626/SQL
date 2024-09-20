@@ -40,4 +40,47 @@ WHERE country ='UK'
 GROUP BY year_id, productline
 ORDER BY year_id) AS a;
 --Who is the best customer, analysis based on RFM
+SELECT
+year_id, productline,revenue,
+RANK() OVER( PARTITION BY year_id ORDER BY revenue DESC ) as Rank
+FROM
+(SELECT
+year_id, productline,
+SUM(quantityordered*priceeach) AS revenue
+FROM public.sales_dataset_rfm_prj
+WHERE country ='UK'
+GROUP BY year_id, productline
+ORDER BY year_id) AS a;
+--Who is the best customer, analysis based on RFM
+WITH customer_rfm AS
+(
+SELECT 
+customername,
+current_date - Max(orderdate) as R,
+COUNT(DISTINCT customername)as F,
+SUM(sales) as M
+FROM public.sales_dataset_rfm_prj
+GROUP BY customername)
+, rfm_score AS(
+SELECT customername,
+ntile(5) over(order by R DESC) as R_score,
+ntile(5) over(order by F ) as F_score,
+ntile(5) over(order by M ) as M_score
+FROM customer_rfm)
+, rfm_final AS (
+SELECT 
+customername,
+CAST(R_score AS VARCHAR) || CAST(F_score AS VARCHAR) || CAST(M_score AS VARCHAR) as rfm_score
+FROM rfm_score)
+
+SELECT
+segment, count(*)
+FROM (
+SELECT
+a.customername, b.segment
+FROM rfm_final AS a
+JOIN public.segment_score AS b ON a.rfm_score = b.scores) a
+GROUP BY segment
+ORDER BY count(*);
+
 
