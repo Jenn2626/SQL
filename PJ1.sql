@@ -82,7 +82,7 @@ FROM public.sales_dataset_rfm_prj) AS avg_qty,
 FROM public.sales_dataset_rfm_prj) AS stddev_qty
 FROM public.sales_dataset_rfm_prj
 	)
-	cte_outlier AS(
+	,cte_outlier AS(
 SELECT ordernumber,quantityordered, 
 	(quantityordered-avg_qty) / stddev_qty AS z_code
 FROM cte
@@ -92,7 +92,7 @@ FROM cte
 Update public.sales_dataset_rfm_prj
 set quantityordered = (SELECT AVG(quantityordered)
 FROM public.sales_dataset_rfm_prj)
-where quantityordered IN (SELECT quantityordered FROM cte_outlier),
+where quantityordered IN (SELECT quantityordered FROM cte_outlier);
 
 
 
